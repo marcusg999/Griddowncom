@@ -9,6 +9,7 @@ members = [
     "crates/gdc-node",
     "crates/gdc-sim",
     "crates/gdc-baseline",
+    "crates/gdc-power",
 ]
 
 [workspace.package]

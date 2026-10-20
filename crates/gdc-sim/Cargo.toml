@@ -3,7 +3,16 @@ name = "gdc-sim"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+description = "Discrete-event simulator, measurement harness and blind A/B rig for GridDown."
+
+[[bin]]
+name = "gdc-sim"
+path = "src/bin/gdc-sim.rs"
 
 [dependencies]
 gdc-wire = { path = "../gdc-wire" }
 thiserror.workspace = true
+rand.workspace = true
+rand_chacha.workspace = true
+serde = { workspace = true }
+serde_json.workspace = true

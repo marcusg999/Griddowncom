@@ -104,6 +104,7 @@ there, say so in your report instead.
 | `gdc-node`       | Assembles the above into one node state machine            |
 | `gdc-sim`        | PHY, mobility, battery, harness, blind A/B rig             |
 | `gdc-baseline`   | Faithful Bridgefy and bitchat models for comparison        |
+| `gdc-power`      | Energy model, duty-cycle policy, radio scheduling budget   |
 
 If you need something from another crate that does not exist yet, define the
 narrowest trait you need in your own crate and note the dependency in your

@@ -1,0 +1,12 @@
+[
+  {"piece":"Transport","crate":"gdc-transport","kind":"judged","builder":"building","critic":"blocked on rig","rounds":0,"blind_verdict":"not yet run","biggest_gap":"—"},
+  {"piece":"Routing","crate":"gdc-routing","kind":"judged","builder":"building","critic":"blocked on rig","rounds":0,"blind_verdict":"not yet run","biggest_gap":"—"},
+  {"piece":"Store and forward","crate":"gdc-store","kind":"judged","builder":"building","critic":"blocked on rig","rounds":0,"blind_verdict":"not yet run","biggest_gap":"—"},
+  {"piece":"Crypto","crate":"gdc-crypto","kind":"judged","builder":"building","critic":"blocked on rig","rounds":0,"blind_verdict":"not yet run","biggest_gap":"—"},
+  {"piece":"Onboarding","crate":"ui/onboarding","kind":"judged","builder":"building","critic":"blocked on rig","rounds":0,"blind_verdict":"not yet run","biggest_gap":"—"},
+  {"piece":"Message screen","crate":"ui/message","kind":"judged","builder":"building","critic":"blocked on rig","rounds":0,"blind_verdict":"not yet run","biggest_gap":"—"},
+  {"piece":"Battery","crate":"gdc-power","kind":"judged","builder":"building","critic":"blocked on rig","rounds":0,"blind_verdict":"not yet run","biggest_gap":"—"},
+  {"piece":"Simulator and blind rig","crate":"gdc-sim","kind":"judging rig","builder":"building","critic":"n/a","rounds":0,"blind_verdict":"n/a","biggest_gap":"—"},
+  {"piece":"Bridgefy and bitchat baselines","crate":"gdc-baseline","kind":"judging rig","builder":"building","critic":"n/a","rounds":0,"blind_verdict":"n/a","biggest_gap":"—"},
+  {"piece":"Wire format","crate":"gdc-wire","kind":"frozen contract","builder":"done","critic":"n/a","rounds":0,"blind_verdict":"n/a","biggest_gap":"—"}
+]

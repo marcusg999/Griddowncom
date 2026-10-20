@@ -27,6 +27,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "gdc-power"
+version = "0.1.0"
+dependencies = [
+ "gdc-wire",
+ "thiserror",
+]
+
+[[package]]
 name = "gdc-routing"
 version = "0.1.0"
 dependencies = [

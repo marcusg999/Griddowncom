@@ -1,0 +1,6 @@
+[
+  {"at":"2026-10-20","event":"Interview completed","detail":"Stack, threat model, battery budget, payload scope, identity model and device count settled. Two conflicts surfaced and resolved: reach-above-all against the do-not-repeat-the-research constraint, and ephemeral identity against the roster and store-and-forward requirements."},
+  {"at":"2026-10-20","event":"Research read","detail":"Both Bridgefy papers extracted in full, plus the SDK propagation profile table and the bitchat whitepaper. 14 published findings catalogued; Bridgefy's packet format and flood behaviour recovered in enough detail to rebuild it faithfully as a blind opponent."},
+  {"at":"2026-10-20","event":"Contracts frozen","detail":"The research contract, the metrics contract and the on-wire format landed. Wire format enforces fixed-size buckets structurally, so frame length cannot leak payload content."},
+  {"at":"2026-10-20","event":"Nine builders launched","detail":"Seven judged pieces plus the simulator and the baselines. Critics are blocked until the blind rig exists, by design: a verdict without a shared judging substrate is worthless."}
+]

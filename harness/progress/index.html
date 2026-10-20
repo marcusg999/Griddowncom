@@ -1,0 +1,298 @@
+<!-- Layout: a board you leave open. Status line, three tiles for the gauntlet
+     state, then the per-piece table that is the real content, then every
+     metric with its provenance, then the log. Nothing animates. -->
+<style>
+  .gd { font-family: var(--font-anthropic-sans); }
+  .gd-head { display: flex; flex-direction: column; gap: var(--cds-gap-xs); margin-bottom: var(--cds-gap-lg); }
+  .gd-title { font-family: var(--font-anthropic-serif); font-weight: 400;
+              font-size: var(--cds-font-size-title); margin: 0; }
+  .gd-take { color: var(--color-fg-muted); font-size: var(--cds-font-size-body); margin: 0; max-width: 60ch; }
+
+  .gd-status { display: flex; align-items: flex-start; gap: var(--cds-gap-sm);
+               background: var(--color-panel); border: 1px solid var(--color-border-line);
+               border-radius: var(--cds-radius); padding: var(--cds-pad-md);
+               margin-bottom: var(--cds-gap-lg); font-size: var(--cds-font-size-body); }
+  .gd-dot { width: .5rem; height: .5rem; border-radius: 50%; flex: none; margin-top: .45em;
+            background: var(--color-warn); }
+
+  .gd-tiles { display: grid; gap: var(--cds-gap-md); margin-bottom: var(--cds-gap-xl);
+              grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+  .gd-tile { background: var(--color-panel); border: 1px solid var(--color-border-line);
+             border-radius: var(--cds-radius); padding: var(--cds-pad-lg);
+             display: flex; flex-direction: column; gap: var(--cds-gap-xs); min-width: 0; }
+  .gd-tile-label { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .gd-tile-num { font-family: var(--font-anthropic-serif); font-weight: 400;
+                 font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums;
+                 line-height: 1.1; }
+  .gd-tile-of { color: var(--color-fg-muted); font-size: var(--cds-font-size-body); }
+  .gd-tile-note { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+
+  .gd-sec { margin-bottom: var(--cds-gap-xl); }
+  .gd-sec-h { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium);
+              margin: 0 0 var(--cds-gap-xs); }
+  .gd-sec-note { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption);
+                 margin: 0 0 var(--cds-gap-md); max-width: 72ch; }
+
+  .gd-card { background: var(--color-panel); border: 1px solid var(--color-border-line);
+             border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; }
+  .gd-scroll { overflow-x: auto; }
+  .gd table { border-collapse: collapse; width: 100%; font-size: var(--cds-font-size-caption); }
+  .gd th { text-align: left; font-weight: var(--cds-font-weight-medium);
+           color: var(--color-fg-muted); padding: 0 var(--cds-pad-sm) var(--cds-pad-xs) 0;
+           border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+  .gd td { padding: var(--cds-pad-xs) var(--cds-pad-sm) var(--cds-pad-xs) 0;
+           border-bottom: 1px solid var(--color-border-line); vertical-align: top; }
+  .gd td.gd-num { font-variant-numeric: tabular-nums; text-align: right; padding-right: var(--cds-pad-md); }
+  .gd tr:last-child td { border-bottom: 0; }
+  .gd-piece { font-weight: var(--cds-font-weight-medium); color: var(--color-fg); white-space: nowrap; }
+  .gd-wrap { min-width: 22ch; }
+
+  .gd-pill { display: inline-block; padding: .1em .5em; border-radius: var(--cds-radius);
+             border: 1px solid var(--color-border-line); font-size: var(--cds-font-size-caption);
+             white-space: nowrap; }
+  .gd-pill-wait { color: var(--color-fg-muted); }
+  .gd-pill-run  { color: var(--color-warn); border-color: var(--color-warn); }
+  .gd-pill-done { color: var(--color-ok); border-color: var(--color-ok); }
+  .gd-pill-bad  { color: var(--color-bad); border-color: var(--color-bad); }
+
+  .gd-prov { color: var(--color-fg-muted); }
+  .gd-none { color: var(--color-fg-muted); }
+  .gd-log { display: flex; flex-direction: column; gap: var(--cds-gap-md); }
+  .gd-log-row { display: grid; grid-template-columns: 7rem 1fr; gap: var(--cds-gap-md); }
+  .gd-log-at { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption);
+               font-variant-numeric: tabular-nums; }
+  .gd-log-ev { font-weight: var(--cds-font-weight-medium); font-size: var(--cds-font-size-caption);
+               margin-bottom: .2em; }
+  .gd-log-de { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); max-width: 72ch; }
+  @media (max-width: 30rem) { .gd-log-row { grid-template-columns: 1fr; gap: var(--cds-gap-xs); } }
+</style>
+
+<div class="gd">
+  <div class="gd-head">
+    <h1 class="gd-title">GridDown gauntlet</h1>
+    <p class="gd-take" id="gd-takeaway">&mdash;</p>
+  </div>
+
+  <div class="gd-status">
+    <span class="gd-dot" id="gd-status-dot"></span>
+    <span id="gd-status-text">&mdash;</span>
+  </div>
+
+  <div class="gd-tiles">
+    <div class="gd-tile">
+      <span class="gd-tile-label">Pieces won blind against Bridgefy</span>
+      <span>
+        <span class="gd-tile-num" data-source="gauntlet" data-field="won" data-row="0">&mdash;</span>
+        <span class="gd-tile-of">of <span data-source="gauntlet" data-field="judged" data-row="0">&mdash;</span></span>
+      </span>
+      <span class="gd-tile-note">A critic must pick ours with the labels stripped. Nothing counts until it does.</span>
+    </div>
+    <div class="gd-tile">
+      <span class="gd-tile-label">Published findings reproduced</span>
+      <span>
+        <span class="gd-tile-num" data-source="metrics" data-field="ours"
+              data-where="metric=Published%20Bridgefy%20findings%20reproduced">&mdash;</span>
+        <span class="gd-tile-of">of 14</span>
+      </span>
+      <span class="gd-tile-note">Target is zero. 14 findings across the 2020 and 2022 papers; ten hard rules derived from them.</span>
+    </div>
+    <div class="gd-tile">
+      <span class="gd-tile-label">Builders reporting complete</span>
+      <span>
+        <span class="gd-tile-num" data-source="gauntlet" data-field="builders_done" data-row="0">&mdash;</span>
+        <span class="gd-tile-of">of <span data-source="gauntlet" data-field="builders_total" data-row="0">&mdash;</span></span>
+      </span>
+      <span class="gd-tile-note">Seven judged pieces, plus the simulator and the baselines that make judging possible.</span>
+    </div>
+  </div>
+
+  <div class="gd-sec">
+    <h2 class="gd-sec-h">The pieces</h2>
+    <p class="gd-sec-note">Each piece is built and judged on its own. A critic exercises the build, puts it
+      beside Bridgefy with the labels stripped, says which is better and names the single biggest remaining
+      gap, then hands it back. The loop runs until the critic picks ours.</p>
+    <div class="gd-card gd-scroll">
+      <table data-source="pieces" data-row-key="piece">
+        <thead><tr>
+          <th data-field="piece">Piece</th>
+          <th data-field="crate">Owns</th>
+          <th data-field="builder">Builder</th>
+          <th data-field="critic">Critic</th>
+          <th data-field="rounds">Rounds</th>
+          <th data-field="blind_verdict">Blind verdict</th>
+          <th data-field="biggest_gap">Biggest remaining gap</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="gd-sec">
+    <h2 class="gd-sec-h">Every number, and where it came from</h2>
+    <p class="gd-sec-note">Per-hop distance in a built-up area and end-to-end delivery across three or more
+      hops are the two the project is graded on. A blank is a number nobody has produced yet, not a zero.
+      Nothing here is a field measurement until it says so: this machine has no radios and no phones, so
+      hardware numbers come from the field rounds and everything else is modelled.</p>
+    <div class="gd-card gd-scroll">
+      <table data-source="metrics" data-row-key="metric">
+        <thead><tr>
+          <th data-field="metric">Metric</th>
+          <th data-field="unit">Unit</th>
+          <th data-field="target">Target</th>
+          <th data-field="ours">Ours</th>
+          <th data-field="bridgefy">Bridgefy</th>
+          <th data-field="provenance">Provenance</th>
+          <th data-field="note">Note</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="gd-sec">
+    <h2 class="gd-sec-h">Log</h2>
+    <div class="gd-card">
+      <div class="gd-log" data-source="timeline"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var PILL = [
+    [/^done$/i,                      'gd-pill-done'],
+    [/^(building|running|in progress)/i, 'gd-pill-run'],
+    [/^(blocked|not yet|waiting)/i,  'gd-pill-wait'],
+    [/^(failed|lost|theirs)/i,       'gd-pill-bad'],
+    [/^ours$/i,                      'gd-pill-done'],
+    [/^n\/a$/i,                      'gd-pill-wait']
+  ];
+  function pillClass(v) {
+    for (var i = 0; i < PILL.length; i++) if (PILL[i][0].test(v)) return PILL[i][1];
+    return 'gd-pill-wait';
+  }
+  function pill(td, v) {
+    var s = document.createElement('span');
+    s.className = 'gd-pill ' + pillClass(v);
+    s.textContent = v;
+    td.appendChild(s);
+  }
+  function plain(td, v, cls) {
+    if (cls) td.className = cls;
+    td.textContent = (v === null || v === undefined || v === '') ? '—' : String(v);
+  }
+
+  dash.calc('gauntlet', {
+    title: 'Gauntlet state',
+    description: 'Counts the pieces whose blind verdict picked ours, and the builders reporting complete, from the pieces table.',
+    inputs: ['pieces'],
+    fn: function (pieces) {
+      var judged = 0, won = 0, done = 0;
+      for (var i = 0; i < pieces.length; i++) {
+        var p = pieces[i];
+        if (p.kind === 'judged') {
+          judged++;
+          if (String(p.blind_verdict).toLowerCase() === 'ours') won++;
+        }
+        if (p.kind !== 'frozen contract' && String(p.builder).toLowerCase() === 'done') done++;
+      }
+      return [{won: won, judged: judged, builders_done: done, builders_total: 9}];
+    }
+  });
+
+  function skel(on) {
+    ['gd-takeaway', 'gd-status-text'].forEach(function (id) {
+      document.getElementById(id).classList.toggle('dash-skeleton', on);
+    });
+  }
+
+  dash.onData(function () {
+    var P = dash.data('pieces'), M = dash.data('metrics'), T = dash.data('timeline');
+
+    skel(P.status === 'loading');
+
+    // Status line: say what is actually blocking, in one sentence.
+    var dot = document.getElementById('gd-status-dot');
+    var txt = document.getElementById('gd-status-text');
+    var take = document.getElementById('gd-takeaway');
+
+    if (P.status === 'ok') {
+      var rows = P.data || [];
+      var building = rows.filter(function (r) { return /^building/i.test(r.builder); }).length;
+      var blocked  = rows.filter(function (r) { return /^blocked/i.test(r.critic); }).length;
+      var judged   = rows.filter(function (r) { return r.kind === 'judged'; }).length;
+      var won      = rows.filter(function (r) { return String(r.blind_verdict).toLowerCase() === 'ours'; }).length;
+
+      if (won >= judged && judged > 0) {
+        dot.style.background = 'var(--color-ok)';
+        txt.textContent = 'Every piece has been picked over Bridgefy blind. The loop is finished.';
+      } else if (blocked > 0) {
+        dot.style.background = 'var(--color-warn)';
+        txt.textContent = building + ' builders are still working and ' + blocked +
+          ' critics are deliberately held back until the simulator and the Bridgefy baseline exist. ' +
+          'A verdict without a shared judging rig would not mean anything.';
+      } else {
+        dot.style.background = 'var(--color-warn)';
+        txt.textContent = won + ' of ' + judged + ' pieces have been picked over Bridgefy blind. ' +
+          'The rest are still in the loop.';
+      }
+      take.textContent = 'An off-grid messenger over phone-to-phone Bluetooth and infrastructure-free ' +
+        'Wi-Fi, carried across a city by hop count and by people walking. Built piece by piece, each one ' +
+        'judged blind against the real Bridgefy protocol and against bitchat, which is the harder opponent.';
+    } else if (P.status === 'error' || P.status === 'connect') {
+      dot.style.background = 'var(--color-bad)';
+      txt.textContent = 'Failed to load';
+      take.textContent = '—';
+    }
+
+    // Pieces
+    var pb = document.querySelector('table[data-source="pieces"] tbody');
+    pb.textContent = '';
+    if (P.status === 'ok') {
+      (P.data || []).forEach(function (r) {
+        var tr = pb.insertRow();
+        plain(tr.insertCell(), r.piece, 'gd-piece');
+        plain(tr.insertCell(), r.crate, 'gd-prov');
+        pill(tr.insertCell(), String(r.builder));
+        pill(tr.insertCell(), String(r.critic));
+        plain(tr.insertCell(), r.rounds, 'gd-num');
+        pill(tr.insertCell(), String(r.blind_verdict));
+        plain(tr.insertCell(), r.biggest_gap, 'gd-wrap');
+      });
+    }
+
+    // Metrics
+    var mb = document.querySelector('table[data-source="metrics"] tbody');
+    mb.textContent = '';
+    if (M.status === 'ok') {
+      (M.data || []).forEach(function (r) {
+        var tr = mb.insertRow();
+        plain(tr.insertCell(), r.metric, 'gd-piece');
+        plain(tr.insertCell(), r.unit, 'gd-prov');
+        plain(tr.insertCell(), r.target, 'gd-prov');
+        plain(tr.insertCell(), r.ours, 'gd-num');
+        plain(tr.insertCell(), r.bridgefy, 'gd-num');
+        plain(tr.insertCell(), r.provenance, 'gd-prov');
+        plain(tr.insertCell(), r.note, 'gd-wrap');
+      });
+    }
+
+    // Log
+    var lg = document.querySelector('.gd-log');
+    lg.textContent = '';
+    if (T.status === 'ok') {
+      (T.data || []).slice().reverse().forEach(function (r) {
+        var row = document.createElement('div'); row.className = 'gd-log-row';
+        var at = document.createElement('div'); at.className = 'gd-log-at';
+        at.textContent = String(r.at); row.appendChild(at);
+        var body = document.createElement('div');
+        var ev = document.createElement('div'); ev.className = 'gd-log-ev';
+        ev.textContent = String(r.event); body.appendChild(ev);
+        var de = document.createElement('div'); de.className = 'gd-log-de';
+        de.textContent = String(r.detail); body.appendChild(de);
+        row.appendChild(body); lg.appendChild(row);
+      });
+    }
+  });
+})();
+</script>
