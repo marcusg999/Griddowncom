@@ -1,0 +1,9 @@
+[package]
+name = "gdc-transport"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+gdc-wire = { path = "../gdc-wire" }
+thiserror.workspace = true

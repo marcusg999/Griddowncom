@@ -1,0 +1,32 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/gdc-wire",
+    "crates/gdc-crypto",
+    "crates/gdc-routing",
+    "crates/gdc-transport",
+    "crates/gdc-store",
+    "crates/gdc-node",
+    "crates/gdc-sim",
+    "crates/gdc-baseline",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[workspace.dependencies]
+thiserror = "2.0.9"
+rand = "0.8.5"
+rand_chacha = "0.3.1"
+tracing = "0.1.41"
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.135"
+
+[profile.release]
+lto = true
+codegen-units = 1
+
+[profile.bench]
+lto = true
