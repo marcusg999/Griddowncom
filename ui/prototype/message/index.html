@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en" data-theme="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Message screen prototype</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<div id="rig">
+
+  <!-- ============== THE PHONE ============== -->
+  <div class="phone-wrap">
+    <div class="phone" id="phone">
+      <div class="screen" id="screen">
+
+        <header class="topbar">
+          <div class="chip" id="chip-channel">CHANNEL 7</div>
+          <div class="chip" id="chip-range">IN RANGE 0</div>
+          <button class="chip btn-chip" id="btn-theme" aria-label="Switch between day and dark mode">DARK</button>
+        </header>
+
+        <div id="banner" class="banner" hidden></div>
+
+        <main id="feed" class="feed" role="log" aria-live="polite" aria-label="Messages"></main>
+
+        <nav class="tabs" id="tabs" role="tablist">
+          <button class="tab is-on" data-pane="pad" role="tab" aria-selected="true">PAD</button>
+          <button class="tab" data-pane="type" role="tab" aria-selected="false">TYPE</button>
+          <button class="tab" data-pane="who" role="tab" aria-selected="false">WHO</button>
+        </nav>
+
+        <div class="trayline" id="trayline">
+          <button class="pinrow" id="btn-pin" aria-pressed="true">
+            <span class="pinrow-mark" id="pin-mark">[+]</span>
+            <span class="pinrow-text" id="pin-text">YOUR POSITION WILL BE SENT</span>
+            <span class="pinrow-act">TAP TO STOP</span>
+          </button>
+          <div class="undo" id="undo" hidden>
+            <button class="undo-btn" id="btn-undo">UNDO</button>
+            <div class="undo-mid">
+              <div class="undo-head" id="undo-head">SENDING IN 4</div>
+              <div class="undo-sub" id="undo-sub"></div>
+            </div>
+            <button class="undo-now" id="btn-now">NOW</button>
+          </div>
+        </div>
+
+        <section class="pane pane-pad is-on" id="pane-pad" role="tabpanel" aria-label="Canned message pad"></section>
+
+        <section class="pane pane-type" id="pane-type" role="tabpanel" aria-label="Type a message" hidden>
+          <textarea id="ta" rows="3" maxlength="500" placeholder="Type here. Keep it short."
+                    aria-label="Message text, up to 500 bytes"></textarea>
+          <div class="bytes" id="bytes">0 of 500 bytes</div>
+          <button class="send" id="btn-send">SEND</button>
+        </section>
+
+        <section class="pane pane-who" id="pane-who" role="tabpanel" aria-label="Who is reachable" hidden>
+          <div class="who-head">
+            <div class="who-title">WHO IS REACHABLE RIGHT NOW</div>
+            <div class="who-note">Live list. Nothing here is saved. These names are gone when the app closes.</div>
+          </div>
+          <div id="dupe-warn" class="dupe-warn" hidden></div>
+          <div id="roster" class="roster"></div>
+        </section>
+
+        <!-- verification sheet -->
+        <div class="sheet" id="sheet" hidden>
+          <div class="sheet-card">
+            <div class="sheet-title" id="sheet-title">CHECK THIS NAME</div>
+            <div class="sheet-body">
+              <p>Stand next to them. One of you reads these four words out loud.</p>
+              <div class="words" id="sheet-words"></div>
+              <p>If their phone shows the same four words, the name is real.</p>
+            </div>
+            <button class="sheet-ok" id="sheet-match">THE WORDS MATCH</button>
+            <button class="sheet-bad" id="sheet-nomatch">THEY DO NOT MATCH</button>
+            <button class="sheet-cancel" id="sheet-cancel">NOT NOW</button>
+          </div>
+        </div>
+
+        <!-- what-this-means sheet -->
+        <div class="sheet" id="explain" hidden>
+          <div class="sheet-card">
+            <div class="sheet-title" id="explain-title"></div>
+            <div class="sheet-body" id="explain-body"></div>
+            <button class="sheet-ok" id="explain-close">GOT IT</button>
+          </div>
+        </div>
+
+        <!-- screen-off overlay: the clock for every task starts when this is tapped -->
+        <div class="lock" id="lock">
+          <div class="lock-inner">
+            <div class="lock-big">SCREEN OFF</div>
+            <div class="lock-small">TAP TO WAKE</div>
+          </div>
+        </div>
+
+      </div><!-- /screen -->
+    </div><!-- /phone -->
+  </div>
+
+  <!-- ============== RIG (not part of the product) ============== -->
+  <aside id="panel">
+    <h1>RIG · not part of the product</h1>
+
+    <section>
+      <h2>World</h2>
+      <div class="row">
+        <label>seed <input id="seed" type="text" value="7" size="6"></label>
+        <button id="r-reset">RESET WORLD</button>
+      </div>
+      <div class="row">
+        <label><input id="r-churn" type="checkbox" checked> peers come and go on their own</label>
+      </div>
+      <div class="row">
+        <label><input id="r-inbound" type="checkbox" checked> peers send messages on their own</label>
+      </div>
+      <div class="row btns">
+        <button id="r-join">PEER ARRIVES</button>
+        <button id="r-leave">PEER LEAVES</button>
+        <button id="r-zero">ALL PEERS GONE</button>
+      </div>
+      <div class="row btns">
+        <button id="r-msg">INBOUND NOW</button>
+        <button id="r-carried">INBOUND, CARRIED 23 MIN</button>
+        <button id="r-dupe">DUPLICATE NICKNAME</button>
+      </div>
+      <div class="row btns">
+        <button id="r-expire">EXPIRE OLDEST QUEUED</button>
+        <button id="r-courier">NEXT SEND GOES BY COURIER</button>
+      </div>
+      <p class="fine" id="clocknote"></p>
+    </section>
+
+    <section>
+      <h2>Scripted tasks</h2>
+      <select id="task"></select>
+      <div class="row btns">
+        <button id="t-start">START TASK (locks screen)</button>
+        <button id="t-pass">SCORED CORRECT</button>
+        <button id="t-fail">SCORED WRONG</button>
+      </div>
+      <p class="fine">START locks the screen. The clock begins the instant the screen is woken, and stops when the task's completion event fires. Taps are counted from the wake tap onward.</p>
+      <div id="t-live" class="tlive"></div>
+    </section>
+
+    <section>
+      <h2>Instrumentation</h2>
+      <div class="row btns">
+        <button id="m-report">REPORT</button>
+        <button id="m-csv">DOWNLOAD CSV</button>
+        <button id="m-json">DOWNLOAD JSON</button>
+        <button id="m-clear">CLEAR</button>
+      </div>
+      <pre id="m-out"></pre>
+      <p class="fine">Also available in the console: <code>gd.report()</code>, <code>gd.events()</code>, <code>gd.sends()</code>, <code>gd.csv()</code>.</p>
+    </section>
+  </aside>
+
+</div>
+
+<script src="sim.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
