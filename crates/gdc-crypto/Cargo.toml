@@ -1,0 +1,31 @@
+[package]
+name = "gdc-crypto"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# Versions are pinned exactly. This crate is the one place in the workspace
+# where a silent minor-version bump could change a security property without
+# changing a line of our code, so Cargo is not given room to pick.
+[dependencies]
+gdc-wire = { path = "../gdc-wire" }
+thiserror.workspace = true
+
+# Noise handshake. Chosen over a hand-rolled exchange; see `handshake`.
+snow = "=0.9.6"
+# X25519 static keys for the Noise pattern. `static_secrets` so we can build a
+# keypair from injected randomness instead of snow's ambient OsRng.
+x25519-dalek = { version = "=2.0.1", features = ["static_secrets", "zeroize"] }
+# Per-message sender authentication inside a channel.
+ed25519-dalek = { version = "=2.1.1", features = ["zeroize"] }
+chacha20poly1305 = "=0.10.1"
+hkdf = "=0.12.4"
+hmac = "=0.12.1"
+sha2 = "=0.10.8"
+zeroize = { version = "=1.8.1", features = ["zeroize_derive"] }
+subtle = "=2.6.1"
+rand_core = { version = "=0.6.4", features = ["getrandom"] }
+rand_chacha = "=0.3.1"
+
+[dev-dependencies]
+proptest = "=1.5.0"

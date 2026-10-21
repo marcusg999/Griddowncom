@@ -1,0 +1,13 @@
+[
+  {"metric":"M1 per-hop distance, iOS to Android, background","unit":"m","target":"beat Bridgefy","ours":null,"bridgefy":null,"note":"Bridgefy claims ~100 m per link in its own docs; unverified. The mixed-platform background case is the one that matters and the one nobody publishes.","provenance":"no data yet"},
+  {"metric":"M1 per-hop distance, Android to Android, background","unit":"m","target":"beat Bridgefy","ours":null,"bridgefy":null,"note":"Needs the field round. Coded PHY S=8 is the lever we expect to win on.","provenance":"no data yet"},
+  {"metric":"M2 delivery rate, 3 hops, static chain","unit":"%","target":"beat Bridgefy","ours":null,"bridgefy":null,"note":"Requires 4+ devices with no non-adjacent pair in range.","provenance":"no data yet"},
+  {"metric":"M2 delivery rate, 4 hops, static chain","unit":"%","target":"beat Bridgefy","ours":null,"bridgefy":null,"note":"","provenance":"no data yet"},
+  {"metric":"M2 delivery rate, 3 hops, carrier regime","unit":"%","target":"beat Bridgefy","ours":null,"bridgefy":null,"note":"Chain broken, closed only by a human walking. This is the store-and-forward case.","provenance":"no data yet"},
+  {"metric":"Transmissions per delivered message","unit":"count","target":"far below Bridgefy","ours":null,"bridgefy":null,"note":"Bridgefy floods with a default TTL of 100 and no degree awareness. This is the number we expect to crush by the widest margin.","provenance":"no data yet"},
+  {"metric":"Delivery rate at 150 nodes in range","unit":"%","target":"must not collapse","ours":null,"bridgefy":null,"note":"Bridgefy's unsuppressed flood is expected to fail here. Our claim is that ours does not.","provenance":"no data yet"},
+  {"metric":"Idle relay drain, screen off","unit":"%/hr","target":"5.0","ours":null,"bridgefy":null,"note":"Modelled only until the user measures one real Android device.","provenance":"no data yet"},
+  {"metric":"Time to first message, first-time user","unit":"s","target":"< 20","ours":null,"bridgefy":null,"note":"Measured from the prototype's own instrumentation, then from a real stranger.","provenance":"no data yet"},
+  {"metric":"Time to send a canned message","unit":"s","target":"< 3","ours":null,"bridgefy":null,"note":"","provenance":"no data yet"},
+  {"metric":"Published Bridgefy findings reproduced","unit":"count","target":"0","ours":0,"bridgefy":null,"note":"14 findings across the 2020 and 2022 papers. Ten hard rules derived from them; each gets a test named after the finding it prevents. Currently 0 reproduced because the crypto layer is still being built, not because it has been cleared.","provenance":"contract written, enforcement pending"}
+]

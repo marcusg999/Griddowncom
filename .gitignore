@@ -1,0 +1,9 @@
+# Rust build output
+/target/
+**/*.rs.bk
+
+# Local scratch
+*.tmp
+
+# The progress dashboard's store wrapper is generated from index.html
+harness/progress/_store_index.json

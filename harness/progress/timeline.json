@@ -1,0 +1,32 @@
+[
+ {
+  "at": "2026-10-20",
+  "event": "Interview completed",
+  "detail": "Stack, threat model, battery budget, payload scope, identity model and device count settled. Two conflicts surfaced and resolved: reach-above-all against the do-not-repeat-the-research constraint, and ephemeral identity against the roster and store-and-forward requirements."
+ },
+ {
+  "at": "2026-10-20",
+  "event": "Research read",
+  "detail": "Both Bridgefy papers extracted in full, plus the SDK propagation profile table and the bitchat whitepaper. 14 published findings catalogued; Bridgefy's packet format and flood behaviour recovered in enough detail to rebuild it faithfully as a blind opponent."
+ },
+ {
+  "at": "2026-10-20",
+  "event": "Contracts frozen",
+  "detail": "The research contract, the metrics contract and the on-wire format landed. Wire format enforces fixed-size buckets structurally, so frame length cannot leak payload content."
+ },
+ {
+  "at": "2026-10-20",
+  "event": "Nine builders launched",
+  "detail": "Seven judged pieces plus the simulator and the baselines. Critics are blocked until the blind rig exists, by design: a verdict without a shared judging substrate is worthless."
+ },
+ {
+  "at": "2026-10-21",
+  "event": "All nine builders killed by an account rate limit",
+  "detail": "Nine concurrent Opus agents exhausted the session quota simultaneously. Roughly 18,000 lines of module files survived on disk, but every crate's lib.rs was still the scaffold placeholder, so none of that code had ever been compiled and none of the 220 test functions in it had ever run. Recorded here rather than quietly re-run, because a build that has not seen the compiler is not progress."
+ },
+ {
+  "at": "2026-10-21",
+  "event": "Resumed three builders instead of nine",
+  "detail": "Fan-out reduced to three concurrent agents to stay inside the budget: the simulator and the baselines, because every critic is blocked until the blind rig exists, plus crypto, which was furthest behind and carries the do-not-repeat-the-research rules. Each was told to wire its lib.rs and get its tests actually running before any new feature work. The remaining four pieces are paused with their work intact."
+ }
+]
