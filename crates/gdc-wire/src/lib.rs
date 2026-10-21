@@ -333,7 +333,7 @@ impl Frame {
     }
 }
 
-#[derive(Debug, thiserror::Error, PartialEq, Eq)]
+#[derive(Debug, Clone, thiserror::Error, PartialEq, Eq)]
 pub enum WireError {
     #[error("truncated: need {need} bytes, got {got}")]
     Truncated { need: usize, got: usize },
