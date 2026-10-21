@@ -96,6 +96,32 @@ Note the platform of every position in the chain. A chain with an iPhone in
 the middle, backgrounded, is a different experiment from one with an Android
 there, and the difference is something we expect to be large.
 
+## Round B2 — the corner (do not skip this one)
+
+Added after modelling the site. In a dense downtown canyon, a building corner
+is close to an absolute barrier for a pocketed BLE link: the model in
+`docs/protocol/PHY-URBAN-CANYON.md` puts a pocketed 1M PHY link at roughly zero
+metres past a corner, and even Coded PHY at about four. If that is right, a
+city block is a set of corridors joined only at intersections, useful relays
+live at intersections rather than mid-block, and hop count stops describing
+reach. If it is wrong, we need to know early, because a lot of the routing
+design rests on it.
+
+This round is cheap and decides it.
+
+1. Put D1 mid-block on one street, 15 m back from the corner.
+2. Put D2 on the cross street, 15 m around the corner, with no line of sight
+   to D1. Confirm by eye that you cannot see the other phone's position.
+3. Both pocketed, screens off, backgrounded. Send 30 messages. Record delivery
+   and RSSI.
+4. Now move D3 to the intersection itself, in the open, pocketed. Send another
+   30 from D1 to D2 and see whether the intersection relay closes the path.
+5. Repeat the whole thing for the other app.
+
+Step 4 is the one that matters: it is a direct test of whether an
+intersection-sited relay is worth the special handling we are considering
+giving it.
+
 ## Round C — carrier regime (the other half of M2)
 
 This is the round that tests the product's central claim, and no competitor
@@ -129,6 +155,22 @@ walk-straight-through case is the hard one and the realistic one.
 
 This is the only battery measurement the project will have. Everything else is
 modelled, so this one round decides whether our 5 %/hr claim is real.
+
+## One thing to know about your numbers
+
+You will run these rounds with the grid up. A dense downtown at 2.4 GHz is
+among the most congested RF environments that exists — every access point,
+hotspot and Bluetooth device in every building around you. In the scenario this
+app is for, almost all of that is off the air.
+
+So your measurements will be **pessimistic relative to the real use case**.
+That is the right direction for the error to run, and we will report your
+measured numbers as the headline rather than inflating them with a grid-down
+correction we cannot verify.
+
+The practical consequence for you: if a band delivers nothing, note the time of
+day. A weekday lunchtime downtown is much worse than the same street at 6am,
+and if two rounds disagree, congestion is the first thing to suspect.
 
 ## What to send back
 

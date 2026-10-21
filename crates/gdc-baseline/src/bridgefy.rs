@@ -533,16 +533,19 @@ const F_CONTENT: u8 = 2;
 const F_FORWARD: u8 = 3;
 
 /// Reader that cannot panic: every read is length-checked.
-struct Rd<'a> {
+///
+/// `pub(crate)` so the bitchat model's internal codec uses the same
+/// bounds-checked primitive rather than a second copy that could drift.
+pub(crate) struct Rd<'a> {
     b: &'a [u8],
     i: usize,
 }
 
 impl<'a> Rd<'a> {
-    fn new(b: &'a [u8]) -> Self {
+    pub(crate) fn new(b: &'a [u8]) -> Self {
         Rd { b, i: 0 }
     }
-    fn take(&mut self, n: usize) -> Result<&'a [u8], ProtoError> {
+    pub(crate) fn take(&mut self, n: usize) -> Result<&'a [u8], ProtoError> {
         let end = self.i.checked_add(n).ok_or(ProtoError::BadField("overflow"))?;
         let s = self.b.get(self.i..end).ok_or(ProtoError::Truncated {
             need: end,
@@ -551,24 +554,24 @@ impl<'a> Rd<'a> {
         self.i = end;
         Ok(s)
     }
-    fn u8(&mut self) -> Result<u8, ProtoError> {
+    pub(crate) fn u8(&mut self) -> Result<u8, ProtoError> {
         Ok(self.take(1)?[0])
     }
-    fn u16(&mut self) -> Result<u16, ProtoError> {
+    pub(crate) fn u16(&mut self) -> Result<u16, ProtoError> {
         let s = self.take(2)?;
         Ok(u16::from_le_bytes([s[0], s[1]]))
     }
-    fn u32(&mut self) -> Result<u32, ProtoError> {
+    pub(crate) fn u32(&mut self) -> Result<u32, ProtoError> {
         let s = self.take(4)?;
         Ok(u32::from_le_bytes([s[0], s[1], s[2], s[3]]))
     }
-    fn u64(&mut self) -> Result<u64, ProtoError> {
+    pub(crate) fn u64(&mut self) -> Result<u64, ProtoError> {
         let s = self.take(8)?;
         let mut a = [0u8; 8];
         a.copy_from_slice(s);
         Ok(u64::from_le_bytes(a))
     }
-    fn uuid(&mut self) -> Result<Uuid, ProtoError> {
+    pub(crate) fn uuid(&mut self) -> Result<Uuid, ProtoError> {
         let s = self.take(16)?;
         let mut a = [0u8; 16];
         a.copy_from_slice(s);
@@ -576,7 +579,7 @@ impl<'a> Rd<'a> {
     }
 }
 
-fn put_u16(v: &mut Vec<u8>, x: u16) {
+pub(crate) fn put_u16(v: &mut Vec<u8>, x: u16) {
     v.extend_from_slice(&x.to_le_bytes());
 }
 
