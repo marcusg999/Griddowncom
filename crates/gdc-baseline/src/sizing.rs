@@ -374,9 +374,11 @@ mod tests {
     fn msgpack_sizes_are_the_real_sizes() {
         let mut m = MsgPack::new();
         m.map_header(2).str("hops").uint(100).str("id").bin(&[0u8; 16]);
-        // fixmap(1) + fixstr "hops"(1+4) + uint 100 as uint8(2) + fixstr "id"(1+2)
-        // + bin8 16 bytes(2+16)
-        assert_eq!(m.len(), 1 + 5 + 2 + 3 + 18);
+        // fixmap(1) + fixstr "hops"(1+4) + positive fixint 100(1) + fixstr "id"(1+2)
+        // + bin8 16 bytes(2+16). 100 is below 128, so it costs one byte, not two:
+        // the default TTL is free on the wire, which is part of why nobody
+        // noticed it was 100.
+        assert_eq!(m.len(), 1 + 5 + 1 + 3 + 18);
     }
 
     #[test]

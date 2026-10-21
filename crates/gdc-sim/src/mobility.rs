@@ -113,6 +113,11 @@ impl StreetGrid {
         runs
     }
 
+    /// Is this point on a north-south street.
+    pub fn on_vertical_street(&self, p: Point) -> bool {
+        self.on_street_axis(p.x)
+    }
+
     /// Snap a point to the nearest street intersection, so that a Manhattan
     /// walk between two snapped points stays on streets.
     pub fn snap_to_intersection(&self, p: Point) -> Point {
@@ -343,6 +348,35 @@ pub fn build_trace(spec: &MobilitySpec, nodes: usize, duration: SimTime, seed: u
 /// A timed sequence of positions: `(time_s, point)`, interpolated linearly.
 type Waypoints = Vec<(f64, Point)>;
 
+/// Intermediate points that keep a walk from `a` to `b` on the street network.
+///
+/// A straight line between two street points cuts through buildings, which
+/// would silently corrupt the obstruction count that the PHY model depends on.
+/// Both endpoints lie on some street line, so turning at the grid lines nearest
+/// `b` is always a legal route: at most two corners.
+fn street_route(grid: &StreetGrid, a: Point, b: Point) -> Vec<Point> {
+    if grid.block_m <= 0.0 {
+        return vec![b];
+    }
+    let ib = grid.snap_to_intersection(b);
+    let mut pts = Vec::with_capacity(3);
+    let p1 = if grid.on_vertical_street(a) {
+        Point::new(a.x, ib.y)
+    } else {
+        Point::new(ib.x, a.y)
+    };
+    pts.push(p1);
+    let p2 = if grid.on_vertical_street(b) {
+        Point::new(b.x, p1.y)
+    } else {
+        Point::new(p1.x, b.y)
+    };
+    pts.push(p2);
+    pts.push(b);
+    pts.dedup_by(|x, y| x.distance_to(y) < 1e-6);
+    pts
+}
+
 fn waypoint_schedule(
     rng: &CounterRng,
     node: u64,
@@ -366,13 +400,18 @@ fn waypoint_schedule(
     // waypoints, and the cap stops a pathological config from allocating.
     while t < total && k < 20_000 {
         let next = sample_in_cluster(rng, node, k, c, grid);
-        let leg = here.distance_to(&next) / c.speed_mps.max(0.1);
+        // Walk the street network rather than straight across a building.
+        for leg_end in street_route(grid, here, next) {
+            let leg = here.distance_to(&leg_end) / c.speed_mps.max(0.1);
+            if leg.is_finite() {
+                t += leg;
+            }
+            out.push((t, leg_end));
+            here = leg_end;
+        }
         let pause = c.pause_s.max(0.0) * rng.uniform(node, 0xC0FFEE, k);
-        t += leg;
-        out.push((t, next));
         t += pause;
-        out.push((t, next));
-        here = next;
+        out.push((t, here));
         k += 1;
     }
     out
@@ -552,9 +591,13 @@ mod tests {
             arrived.distance_to(&Point::new(480.0, 0.0)) < 5.0,
             "carrier at {arrived:?} after 400 s"
         );
-        // And it comes back.
-        let returned = tr.position(2, SimTime::from_secs(900));
-        assert!(returned.distance_to(&Point::new(0.0, 0.0)) < 60.0);
+        // And it comes back: 10 s delay + 343 s out + 60 s dwell + 343 s back
+        // puts it home from t=756 s until it sets off again at t=816 s.
+        let returned = tr.position(2, SimTime::from_secs(790));
+        assert!(
+            returned.distance_to(&Point::new(0.0, 0.0)) < 5.0,
+            "carrier at {returned:?} after 790 s"
+        );
     }
 
     #[test]

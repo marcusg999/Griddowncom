@@ -625,6 +625,12 @@ pub fn fit_from_samples(base: &PhyConfig, samples: &[PhySample], round: u32) -> 
         acc
     };
 
+    // When the RSSI regression succeeded it has already identified the exponent
+    // and the reference loss far better than a binary success column can, so the
+    // likelihood stage is not allowed to move them. Letting it do so lets a
+    // threshold-shaped success column pull `n` anywhere that happens to put the
+    // same samples on the same side of the cliff.
+    let rssi_pinned_geometry = n_rssi >= 2 && residual.is_finite();
     let mut best = out.clone();
     let mut best_ll = if outcome.is_empty() {
         f64::NEG_INFINITY
@@ -641,6 +647,9 @@ pub fn fit_from_samples(base: &PhyConfig, samples: &[PhySample], round: u32) -> 
             let mut improved = false;
             let axes: [(usize, f64); 3] = [(0, step_n), (1, step_sigma), (2, step_body)];
             for (axis, step) in axes {
+                if rssi_pinned_geometry && axis == 0 {
+                    continue;
+                }
                 for dir in [-1.0f64, 1.0] {
                     let mut cand = best.clone();
                     match axis {
@@ -976,7 +985,7 @@ mod tests {
         let fit = fit_from_samples(&PhyConfig::default(), &samples, 1);
         assert!(fit.converged);
         assert!(
-            (fit.fitted.path_loss_exponent - 3.6).abs() < 0.25,
+            (fit.fitted.path_loss_exponent - 3.6).abs() < 0.1,
             "fitted n = {}",
             fit.fitted.path_loss_exponent
         );

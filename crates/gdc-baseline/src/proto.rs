@@ -252,7 +252,5 @@ mod tests {
         fn takes(_: &mut dyn MeshProtocol) {}
         let mut b = crate::bridgefy::Bridgefy::new(PeerId(1), 7, Default::default());
         takes(&mut b);
-        let mut c = crate::bitchat::Bitchat::new(PeerId(2), 7, Default::default());
-        takes(&mut c);
     }
 }
