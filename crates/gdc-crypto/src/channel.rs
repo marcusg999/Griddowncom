@@ -195,3 +195,13 @@ impl ChannelKeys {
         }
     }
 }
+
+impl crate::audit::SecretAudit for ChannelKeys {
+    fn audit(&self) -> crate::audit::Audit {
+        let mut parts: Vec<&[u8]> = vec![&self.tag_key[..], &self.psk[..], &self.bind[..]];
+        for (_, r) in &self.roots {
+            parts.push(&r[..]);
+        }
+        crate::audit::Audit::of(&parts)
+    }
+}

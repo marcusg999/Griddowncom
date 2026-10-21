@@ -21,7 +21,7 @@ use thiserror::Error;
 pub struct Rejected;
 
 /// Send-path failures. Local, never derived from remote input.
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Error)]
+#[derive(Clone, PartialEq, Eq, Debug, Error)]
 pub enum SealError {
     /// Payload exceeds [`gdc_wire::MAX_BODY_LEN`].
     #[error("payload too large")]

@@ -73,10 +73,12 @@ pub use channel::{ChannelId, ChannelKeys};
 pub use clock::{Clock, FixedClock, SystemClock};
 pub use error::{CryptoError, Rejected, SealError};
 pub use handshake::{Handshake, LinkBinding, Role, Sas, Session};
-pub use identity::{Nickname, SessionIdentity, SessionKey};
+pub use identity::{Nickname, SessionIdentity, SessionKey, MAX_NICK_LEN};
 pub use invite::{ChannelInvite, InviteError, AUTH_MODE_SIGNED, INVITE_LEN, INVITE_TEXT_LEN};
-pub use message::{Opened, Record, RecordType, max_payload, smallest_bucket_for, BODY_OVERHEAD,
-    MAX_COUNTER_JUMP, MAX_SENDERS_PER_EPOCH, MAX_SKIPPED_KEYS, WIRE_OVERHEAD};
+pub use message::{
+    max_payload, smallest_bucket_for, Opened, Record, RecordType, ReplayWindow, BODY_OVERHEAD,
+    MAX_SENDERS_PER_EPOCH, REPLAY_WINDOW, WIRE_OVERHEAD,
+};
 pub use rng::{OsRng, Rng, TestRng};
 pub use roster::{Roster, RosterEntry, Verification, MAX_ROSTER};
 pub use state::CryptoState;
