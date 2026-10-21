@@ -63,7 +63,7 @@ impl ParamDoc {
 }
 
 /// The calibration state of a whole model.
-#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 #[serde(tag = "state", rename_all = "snake_case")]
 pub enum Calibration {
     /// No field data has ever been fitted. This is the only value that can

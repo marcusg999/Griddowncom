@@ -118,6 +118,8 @@
           <th data-field="crate">Owns</th>
           <th data-field="builder">Builder</th>
           <th data-field="critic">Critic</th>
+          <th data-field="lines">Lines</th>
+          <th data-field="tests_written">Tests</th>
           <th data-field="rounds">Rounds</th>
           <th data-field="blind_verdict">Blind verdict</th>
           <th data-field="biggest_gap">Biggest remaining gap</th>
@@ -218,7 +220,7 @@
 
     if (P.status === 'ok') {
       var rows = P.data || [];
-      var building = rows.filter(function (r) { return /^building/i.test(r.builder); }).length;
+      var building = rows.filter(function (r) { return /^(building|resumed)/i.test(r.builder); }).length;
       var blocked  = rows.filter(function (r) { return /^blocked/i.test(r.critic); }).length;
       var judged   = rows.filter(function (r) { return r.kind === 'judged'; }).length;
       var won      = rows.filter(function (r) { return String(r.blind_verdict).toLowerCase() === 'ours'; }).length;
@@ -228,9 +230,14 @@
         txt.textContent = 'Every piece has been picked over Bridgefy blind. The loop is finished.';
       } else if (blocked > 0) {
         dot.style.background = 'var(--color-warn)';
-        txt.textContent = building + ' builders are still working and ' + blocked +
-          ' critics are deliberately held back until the simulator and the Bridgefy baseline exist. ' +
-          'A verdict without a shared judging rig would not mean anything.';
+        var paused = rows.filter(function (r) { return /^paused/i.test(r.builder); }).length;
+        var written = rows.reduce(function (a, r) { return a + (r.tests_written || 0); }, 0);
+        var passing = rows.reduce(function (a, r) { return a + (r.tests_passing || 0); }, 0);
+        txt.textContent = building + ' builders running, ' + paused +
+          ' paused to stay inside the account budget, and ' + blocked +
+          ' critics held back until the blind rig exists. Of ' + written +
+          ' test functions written so far, ' + passing +
+          ' have actually compiled and run \u2014 the rest are in modules that were never wired in.';
       } else {
         dot.style.background = 'var(--color-warn)';
         txt.textContent = won + ' of ' + judged + ' pieces have been picked over Bridgefy blind. ' +
@@ -255,6 +262,19 @@
         plain(tr.insertCell(), r.crate, 'gd-prov');
         pill(tr.insertCell(), String(r.builder));
         pill(tr.insertCell(), String(r.critic));
+        plain(tr.insertCell(), r.lines, 'gd-num');
+        var tc = tr.insertCell();
+        tc.className = 'gd-num';
+        // A test that has never been compiled is not a passing test. Show both
+        // numbers so the gap between written and running is impossible to miss.
+        if (r.tests_written > 0 && r.tests_passing === 0) {
+          tc.textContent = '0 / ' + r.tests_written;
+          tc.title = r.tests_written + ' written, none compiled yet';
+        } else if (r.tests_written > 0) {
+          tc.textContent = String(r.tests_passing);
+        } else {
+          tc.textContent = '\u2014';
+        }
         plain(tr.insertCell(), r.rounds, 'gd-num');
         pill(tr.insertCell(), String(r.blind_verdict));
         plain(tr.insertCell(), r.biggest_gap, 'gd-wrap');
